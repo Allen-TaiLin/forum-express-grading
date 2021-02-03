@@ -1,12 +1,15 @@
 const bcrypt = require('bcryptjs')
+const app = require('../app')
 const db = require('../models')
 const User = db.User
 
 const userController = {
+  // 註冊頁面
   signUpPage: (req, res) => {
     return res.render('signup')
   },
 
+  // 註冊送出表單
   signUp: (req, res) => {
     // confirm password
     if (req.body.passwordCheck !== req.body.password) {
@@ -31,6 +34,23 @@ const userController = {
           }
         })
     }
+  },
+
+  // 登入頁面
+  signInPage: (req, res) => {
+    return res.render('signin')
+  },
+
+  // 登入送出表單
+  signIn: (req, res) => {
+    req.flash('success_messages', '成功登入！')
+    res.redirect('/restaurants')
+  },
+  // 登出
+  logout: (req, res) => {
+    req.flash('success_messages', '登出成功！')
+    req.logout()
+    res.redirect('/signin')
   }
 }
 

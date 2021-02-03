@@ -2,7 +2,8 @@ const restController = require('../controllers/restController.js')
 const adminController = require('../controllers/adminController.js')
 const userController = require('../controllers/userController.js')
 
-module.exports = (app) => {
+// 記得這邊要接收app、passport
+module.exports = (app, passport) => {
   // 如果使用者訪問首頁，就導向 /restaurants 的頁面
   app.get('/', (req, res) => res.redirect('/restaurants'))
   // 在 /restaurants 底下則交給 restController.getRestaurants 來處理
@@ -11,7 +12,11 @@ module.exports = (app) => {
   app.get('/admin', (req, res) => res.redirect('/admin/restaurants'))
   // 在 /admin/restaurants 底下則交給 adminController.getRestaurants 處理
   app.get('/admin/restaurants', adminController.getRestaurants)
-
+  // 註冊
   app.get('/signup', userController.signUpPage)
   app.post('/signup', userController.signUp)
+  // 登入、登出
+  app.get('/signin', userController.signInPage)
+  app.post('/signin', passport.authenticate('local', { failureRedirect: '/signin', failureFlash: true }), userController.signIn)
+  app.get('/logout', userController.logout)
 }

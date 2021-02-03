@@ -2,6 +2,7 @@ const express = require('express')
 const exphbs = require('express-handlebars')  // 引入 handlebars
 const bodyParser = require('body-parser')
 const session = require('express-session')
+const passport = require('./config/passport')
 const flash = require('connect-flash')
 const db = require('./models')  // 引入資料庫
 const app = express()
@@ -12,6 +13,9 @@ app.set('view engine', 'handlebars')  // 設定使用 Handlebars 做為樣板引
 app.use(bodyParser.urlencoded({ extended: true }))  // setup bodyParser
 // setup session and flash
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }))
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use(flash())
 
 // 把 req.flash 放到 res.locals 裡面
@@ -27,6 +31,6 @@ app.listen(port, () => {
 })
 
 // 引入 routes 並將 app 傳進去，讓 routes 可以用 app 這個物件來指定路由
-require('./routes')(app)
+require('./routes')(app, passport)  // 把 passport 傳入 routes
 
 module.exports = app
