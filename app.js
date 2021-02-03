@@ -28,6 +28,7 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use('/upload', express.static(__dirname + '/upload'))
 
 app.listen(port, () => {
   console.log(`Example app listening on http://localhost:${port}`)
