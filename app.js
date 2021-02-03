@@ -1,6 +1,7 @@
 const express = require('express')
 const exphbs = require('express-handlebars')  // 引入 handlebars
 const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
 const session = require('express-session')
 const passport = require('./config/passport')
 const flash = require('connect-flash')
@@ -11,6 +12,7 @@ const port = 3000
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }))  // Handlebars 註冊樣板引擎
 app.set('view engine', 'handlebars')  // 設定使用 Handlebars 做為樣板引擎
 app.use(bodyParser.urlencoded({ extended: true }))  // setup bodyParser
+app.use(methodOverride('_method'))
 // setup session and flash
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }))
 app.use(passport.initialize())
