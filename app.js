@@ -2,6 +2,11 @@ const express = require('express')
 const exphbs = require('express-handlebars')  // 引入 handlebars
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 const session = require('express-session')
 const passport = require('./config/passport')
 const flash = require('connect-flash')
