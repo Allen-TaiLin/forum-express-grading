@@ -63,6 +63,8 @@ module.exports = (app, passport) => {
     return res.render('admin/categories', { categories: categories })
   })
 
+  app.post('/admin/categories', authenticatedAdmin, categoryController.postCategory)
+
 
   // 註冊
   app.get('/signup', userController.signUpPage)
