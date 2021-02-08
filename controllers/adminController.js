@@ -1,5 +1,5 @@
 const db = require('../models')
-const { Restaurant, User } = db
+const { Restaurant, User, Category } = db
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
@@ -7,7 +7,7 @@ const fs = require('fs')
 
 const adminController = {
   getRestaurants: (req, res) => {
-    return Restaurant.findAll({ raw: true }).then((restaurants) => {
+    return Restaurant.findAll({ raw: true, nest: true, include: [Category] }).then((restaurants) => {
       return res.render('admin/restaurants', { restaurants: restaurants })
     })
   },
@@ -39,23 +39,6 @@ const adminController = {
             return res.redirect('/admin/restaurants')
           })
       })
-      // fs.readFile(file.path, (err, data) => {
-      //   if (err) console.log('Error: ', err)
-      //   fs.writeFile(`upload/${file.originalname}`, data, () => {
-      //     return Restaurant.create({
-      //       name: req.body.name,
-      //       tel: req.body.tel,
-      //       address: req.body.address,
-      //       opening_hours: req.body.opening_hours,
-      //       description: req.body.description,
-      //       image: file ? `/upload/${file.originalname}` : null
-      //     })
-      //       .then((restaurant) => {
-      //         req.flash('success_messages', 'restaurant was successfully created')
-      //         return res.redirect('/admin/restaurants')
-      //       })
-      //   })
-      // })
     } else {
       return Restaurant.create({
         name: req.body.name,
@@ -73,9 +56,9 @@ const adminController = {
   },
 
   getRestaurant: (req, res) => {
-    return Restaurant.findByPk(req.params.id, { raw: true })
+    return Restaurant.findByPk(req.params.id, { include: [Category] })
       .then((restaurant) => {
-        return res.render('admin/restaurant', { restaurant: restaurant })
+        return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
       })
   },
 
@@ -112,26 +95,6 @@ const adminController = {
               })
           })
       })
-      // fs.readFile(file.path, (err, data) => {
-      //   if (err) console.log('Error: ', err)
-      //   fs.writeFile(`upload/${file.originalname}`, data, () => {
-      //     return Restaurant.findByPk(req.params.id)
-      //       .then((restaurant) => {
-      //         restaurant.update({
-      //           name: req.body.name,
-      //           tel: req.body.tel,
-      //           address: req.body.address,
-      //           opening_hours: req.body.opening_hours,
-      //           description: req.body.description,
-      //           image: file ? `/upload/${file.originalname}` : restaurant.image
-      //         })
-      //           .then((restaurant) => {
-      //             req.flash('success_messages', 'restaurant was successfully to update')
-      //             return res.redirect('/admin/restaurants')
-      //           })
-      //       })
-      //   })
-      // })
     } else {
       return Restaurant.findByPk(req.params.id)
         .then((restaurant) => {
