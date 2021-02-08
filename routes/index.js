@@ -3,6 +3,7 @@ const helpers = require('../_helpers')
 const restController = require('../controllers/restController.js')
 const adminController = require('../controllers/adminController.js')
 const userController = require('../controllers/userController.js')
+const categoryController = require('../controllers/categoryController.js')
 
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
@@ -56,6 +57,11 @@ module.exports = (app, passport) => {
   app.get('/admin/users', authenticatedAdmin, adminController.getUsers)
   // 修改使用者權限
   app.put('/admin/users/:id/toggleAdmin', authenticatedAdmin, adminController.toggleAdmin)
+  // 瀏覽分類
+  app.get('/admin/categories', authenticatedAdmin, async (req, res) => {
+    const categories = await categoryController.getCategories()
+    return res.render('admin/categories', { categories: categories })
+  })
 
 
   // 註冊
