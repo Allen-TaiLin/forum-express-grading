@@ -3,6 +3,7 @@
     "cleardb",
     "exphbs",
     "imgur",
+    "originalname",
     "resave",
     "signin",
     "signup"
