@@ -1,23 +1,43 @@
 const db = require('../models')
 const { Restaurant, Category } = db
+const pageLimit = 10
 
 const restController = {
   getRestaurants: (req, res) => {
+    let offset = 0  // 分頁起始
     const whereQuery = {}
     let categoryId = ''
+    // 分頁設定 (有參數時才開始運算)
+    if (req.query.page) {
+      offset = (req.query.page - 1) * pageLimit
+    }
+    // 類別搜尋
     if (req.query.categoryId) {
       categoryId = Number(req.query.categoryId)
       whereQuery.CategoryId = categoryId
     }
-    Restaurant.findAll({
+    Restaurant.findAndCountAll({
       include: Category,
-      where: whereQuery
+      where: whereQuery,
+      offset: offset,
+      limit: pageLimit
     })
-      .then((restaurants) => {
-        const data = restaurants.map((r) => ({
+      .then((result) => {
+        // data for pagination
+        const page = Number(req.query.page) || 1  //  起始頁數
+        const pages = Math.ceil(result.count / pageLimit) //  總頁數
+        const totalPage = Array.from({ length: pages }).map((item, index) => index + 1) //  總共有幾頁 (顯示列表上)
+        console.log('***', totalPage)
+        console.log('result.count:', result.count)
+        console.log('result.raws:', result.rows)
+        const prev = (page - 1 < 1) ? 1 : page - 1
+        const next = (page + 1 > pages) ? pages : page + 1
+
+        // clean up restaurant data
+        const data = result.rows.map((r) => ({
           ...r.dataValues,
           description: r.dataValues.description.substring(0, 50),
-          categoryName: r.Category.name
+          categoryName: r.dataValues.Category.name
         }))
 
         Category.findAll({
@@ -28,7 +48,11 @@ const restController = {
             return res.render('restaurants', {
               restaurants: data,
               categories: categories,
-              categoryId: categoryId
+              categoryId: categoryId,
+              page: page,
+              totalPage: totalPage,
+              prev: prev,
+              next: next
             })
           })
       })
