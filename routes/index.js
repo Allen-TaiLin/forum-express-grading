@@ -58,12 +58,13 @@ module.exports = (app, passport) => {
   // 修改使用者權限
   app.put('/admin/users/:id/toggleAdmin', authenticatedAdmin, adminController.toggleAdmin)
   // 瀏覽分類
-  app.get('/admin/categories', authenticatedAdmin, async (req, res) => {
-    const categories = await categoryController.getCategories()
-    return res.render('admin/categories', { categories: categories })
-  })
+  app.get('/admin/categories', authenticatedAdmin, categoryController.getCategories)
 
   app.post('/admin/categories', authenticatedAdmin, categoryController.postCategory)
+
+  app.get('/admin/categories/:id', authenticatedAdmin, categoryController.getCategories)
+
+  app.put('/admin/categories/:id', authenticatedAdmin, categoryController.putCategory)
 
 
   // 註冊
