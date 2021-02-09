@@ -6,6 +6,7 @@ const userController = require('../controllers/userController.js')
 const categoryController = require('../controllers/categoryController.js')
 
 const multer = require('multer')
+const { authenticate } = require('passport')
 const upload = multer({ dest: 'temp/' })
 
 // 記得這邊要接收app、passport
@@ -36,6 +37,8 @@ module.exports = (app, passport) => {
   app.get('/', authenticated, (req, res) => res.redirect('/restaurants'))
   // 在 /restaurants 底下則交給 restController.getRestaurants 來處理
   app.get('/restaurants', authenticated, restController.getRestaurants)
+
+  app.get('/restaurants/:id', authenticated, restController.getRestaurant)
 
   // 連到 /admin 頁面就轉到 /admin/restaurants
   app.get('/admin', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))
