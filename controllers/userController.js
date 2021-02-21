@@ -1,9 +1,10 @@
 const bcrypt = require('bcryptjs')
 //const app = require('../app')
 const db = require('../models')
-const { User, Comment, Restaurant } = db
+const { User, Comment, Restaurant, Category } = db
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+const sequelize = db.sequelize
 
 const userController = {
   // 註冊頁面
@@ -58,9 +59,29 @@ const userController = {
 
   // 瀏覽 Profile
   getUser: (req, res) => {
-    return User.findByPk(req.params.id)
+    return User.findByPk(req.params.id, {
+      attributes: {
+        include: [
+          [sequelize.literal('(SELECT COUNT(DISTINCT RestaurantId) FROM comments)'), 'restaurant_count'],
+          [sequelize.literal('(SELECT COUNT(DISTINCT id) FROM comments)'), 'comment_count']
+        ]
+      },
+      group: ['comments.RestaurantId'],
+      nest: true,
+      include: {
+        model: Comment,
+        attributes: ['RestaurantId'],
+        nest: true,
+        include: [{
+          model: Restaurant
+        }]
+      }
+    })
       .then((user) => {
-        return res.render('user', { user: user.toJSON() })
+        //console.log('*user.toJSON():', user.toJSON())
+        //console.log('**user.toJSON().Comments[0].Restaurant:', user.toJSON().Comments[0].Restaurant)
+        const restaurants = user.toJSON().Comments.map((item) => item.Restaurant)
+        return res.render('user', { user: user.toJSON(), restaurants })
       })
   },
 
