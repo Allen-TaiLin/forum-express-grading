@@ -12,14 +12,14 @@ module.exports = {
     {
       text: faker.lorem.text().substring(0, 30),
       UserId: 1,
-      RestaurantId: 2,
+      RestaurantId: 11,
       createdAt: new Date(),
       updatedAt: new Date()
     },
     {
       text: faker.lorem.text().substring(0, 30),
       UserId: 1,
-      RestaurantId: 3,
+      RestaurantId: 21,
       createdAt: new Date(),
       updatedAt: new Date()
     }], {})
