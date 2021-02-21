@@ -76,6 +76,11 @@ module.exports = (app, passport) => {
 
   app.delete('/admin/categories/:id', authenticatedAdmin, categoryController.deleteCategory)
 
+  // A19 User Profile
+  app.get('/users/:id', authenticated, userController.getUser)
+  app.get('/users/:id/edit', authenticated, userController.editUser)
+  app.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
+
 
   // 註冊
   app.get('/signup', userController.signUpPage)

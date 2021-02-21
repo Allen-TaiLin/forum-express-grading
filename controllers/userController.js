@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs')
-const app = require('../app')
+//const app = require('../app')
 const db = require('../models')
-const User = db.User
+const { User, Comment, Restaurant } = db
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const userController = {
   // 註冊頁面
@@ -44,13 +46,62 @@ const userController = {
   // 登入送出表單
   signIn: (req, res) => {
     req.flash('success_messages', '成功登入！')
-    res.redirect('/restaurants')
+    return res.redirect('/restaurants')
   },
+
   // 登出
   logout: (req, res) => {
     req.flash('success_messages', '登出成功！')
     req.logout()
-    res.redirect('/signin')
+    return res.redirect('/signin')
+  },
+
+  // 瀏覽 Profile
+  getUser: (req, res) => {
+    return User.findByPk(req.params.id)
+      .then((user) => {
+        return res.render('user', { user: user.toJSON() })
+      })
+  },
+
+  // 瀏覽編輯 Profile 頁面
+  editUser: (req, res) => {
+    return User.findByPk(req.params.id)
+      .then((user) => {
+        return res.render('edit', { user: user.toJSON() })
+      })
+  },
+
+  // 編輯 Profile
+  putUser: async (req, res, next) => {
+    try {
+      const { file } = req
+      let img = null
+      if (file) {
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        const uploadImage = new Promise((resolve, reject) => {
+          imgur.upload(file.path, (error, image) => {
+            img = image
+            resolve()
+          })
+        })
+        await uploadImage.then(() => console.log('uploaded'))
+      }
+
+      return User.findByPk(req.params.id)
+        .then((user) => {
+          user.update({
+            ...req.body,
+            image: (file && img) ? img.data.link : req.body.image
+          }).then(() => {
+            req.flash('success_messages', '個人資料已更新!')
+            res.redirect(`/users/${req.params.id}`)
+          })
+        })
+
+    } catch (error) {
+      next(error)
+    }
   }
 }
 
