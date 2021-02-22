@@ -38,10 +38,12 @@ module.exports = (app, passport) => {
   app.get('/', authenticated, (req, res) => res.redirect('/restaurants'))
   // 在 /restaurants 底下則交給 restController 來處理
   app.get('/restaurants', authenticated, restController.getRestaurants)
-
+  // 最新動態
   app.get('/restaurants/feeds', authenticated, restController.getFeeds)
-
+  // 餐廳資料
   app.get('/restaurants/:id', authenticated, restController.getRestaurant)
+  // 餐廳資料整理
+  app.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
 
   app.post('/comments', authenticated, commentController.postComment)
 
@@ -79,8 +81,11 @@ module.exports = (app, passport) => {
   app.delete('/admin/categories/:id', authenticatedAdmin, categoryController.deleteCategory)
 
   // A19 User Profile
+  // 查詢頁面
   app.get('/users/:id', authenticated, userController.getUser)
+  // 修改頁面
   app.get('/users/:id/edit', authenticated, userController.editUser)
+  // 送出修改
   app.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
 
 

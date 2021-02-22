@@ -80,7 +80,9 @@ const userController = {
       .then((user) => {
         //console.log('*user.toJSON():', user.toJSON())
         //console.log('**user.toJSON().Comments[0].Restaurant:', user.toJSON().Comments[0].Restaurant)
-        const restaurants = user.toJSON().Comments.map((item) => item.Restaurant)
+
+        let restaurants = (user.toJSON().Comments.length > 0) ?
+          user.toJSON().Comments.map((item) => item.Restaurant) : null
         return res.render('user', { user: user.toJSON(), restaurants })
       })
   },

@@ -70,6 +70,7 @@ const restController = {
       })
   },
 
+  // 最新動態
   getFeeds: (req, res) => {
     return Promise.all([
       Restaurant.findAll({
@@ -88,6 +89,17 @@ const restController = {
       })
     ]).then(([restaurants, comments]) => {
       return res.render('feeds', { restaurants, comments })
+    })
+  },
+
+  // 餐廳資訊整理
+  getDashboard: (req, res) => {
+    const id = req.params.id
+    return Promise.all([
+      Comment.count({ where: { RestaurantId: id } }),
+      Restaurant.findByPk(id, { nest: true, include: [Category] })
+    ]).then(([commentCount, restaurant]) => {
+      res.render('dashboard', { commentCount, restaurant: restaurant.toJSON() })
     })
   }
 }
