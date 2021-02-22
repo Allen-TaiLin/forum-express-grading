@@ -3,6 +3,7 @@ const { Restaurant, Category, User, Comment } = db
 const pageLimit = 10
 
 const restController = {
+  // 多筆餐廳資料
   getRestaurants: (req, res) => {
     let offset = 0  // 分頁起始
     const whereQuery = {}
@@ -27,9 +28,9 @@ const restController = {
         const page = Number(req.query.page) || 1  //  起始頁數
         const pages = Math.ceil(result.count / pageLimit) //  總頁數
         const totalPage = Array.from({ length: pages }).map((item, index) => index + 1) //  總共有幾頁 (顯示列表上)
-        console.log('***', totalPage)
-        console.log('result.count:', result.count)
-        console.log('result.raws:', result.rows)
+        // console.log('***', totalPage)
+        // console.log('result.count:', result.count)
+        // console.log('result.rows:', result.rows)
         const prev = (page - 1 < 1) ? 1 : page - 1
         const next = (page + 1 > pages) ? pages : page + 1
 
@@ -58,6 +59,7 @@ const restController = {
       })
   },
 
+  // 單筆餐廳資料
   getRestaurant: (req, res) => {
     return Restaurant.findByPk(req.params.id, {
       include: [
@@ -65,7 +67,12 @@ const restController = {
         { model: Comment, include: [User] }
       ]
     })
-      .then((restaurant) => {
+      .then(async (restaurant) => {
+        if (restaurant) {
+          // 也可以寫 await restaurant.increment('viewCounts', { by: 1 })
+          restaurant = await restaurant.increment({ 'viewCounts': 1 })
+        }
+
         return res.render('restaurant', { restaurant: restaurant.toJSON() })
       })
   },
@@ -97,8 +104,13 @@ const restController = {
     const id = req.params.id
     return Promise.all([
       Comment.count({ where: { RestaurantId: id } }),
-      Restaurant.findByPk(id, { nest: true, include: [Category] })
+      Restaurant.findByPk(id, {
+        nest: true,
+        include: [Category]
+        // attributes: { include: ['viewCounts'] }
+      })
     ]).then(([commentCount, restaurant]) => {
+      // console.log('*restaurant:', restaurant.toJSON())     
       res.render('dashboard', { commentCount, restaurant: restaurant.toJSON() })
     })
   }
