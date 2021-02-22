@@ -48,6 +48,10 @@ module.exports = (app, passport) => {
   app.post('/comments', authenticated, commentController.postComment)
 
   app.delete('/comments/:id', authenticatedAdmin, commentController.deleteComment)
+  // 加入最愛
+  app.post('/favorite/:restaurantId', authenticated, userController.addFavorite)
+  // 移除最愛
+  app.delete('/favorite/:restaurantId', authenticated, userController.removeFavorite)
 
   // 連到 /admin 頁面就轉到 /admin/restaurants
   app.get('/admin', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))

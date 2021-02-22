@@ -22,6 +22,48 @@ module.exports = {
       RestaurantId: 21,
       createdAt: new Date(),
       updatedAt: new Date()
+    },
+    {
+      text: faker.lorem.text().substring(0, 30),
+      UserId: 2,
+      RestaurantId: 11,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      text: faker.lorem.text().substring(0, 30),
+      UserId: 2,
+      RestaurantId: 21,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      text: faker.lorem.text().substring(0, 30),
+      UserId: 2,
+      RestaurantId: 31,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      text: faker.lorem.text().substring(0, 30),
+      UserId: 3,
+      RestaurantId: 11,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      text: faker.lorem.text().substring(0, 30),
+      UserId: 3,
+      RestaurantId: 21,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      text: faker.lorem.text().substring(0, 30),
+      UserId: 3,
+      RestaurantId: 31,
+      createdAt: new Date(),
+      updatedAt: new Date()
     }], {})
   },
 
