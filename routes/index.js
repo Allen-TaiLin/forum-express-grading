@@ -57,6 +57,8 @@ module.exports = (app, passport) => {
   // 解除like
   app.delete('/like/:restaurantId', authenticated, userController.removeLike)
 
+  app.get('/users/top', authenticated, userController.getTopUser)
+
   // 連到 /admin 頁面就轉到 /admin/restaurants
   app.get('/admin', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))
   // 在 /admin/restaurants 底下則交給 adminController.getRestaurants 處理
