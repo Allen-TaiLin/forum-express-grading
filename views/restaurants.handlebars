@@ -45,11 +45,11 @@
 
         {{#if this.isLiked }}
         <form action="/like/{{this.id}}?_method=DELETE" method="POST" style="display: inline;"><button type="submit"
-            class="btn btn-warning">liked</button>
+            class="btn btn-warning">Unlike</button>
         </form>
         {{else}}
         <form action="/like/{{this.id}}" method="POST" style="display: inline;"><button type="submit"
-            class="btn btn-primary">like</button>
+            class="btn btn-primary">Like</button>
         </form>
         {{/if}}
       </div>

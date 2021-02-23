@@ -1,6 +1,7 @@
 const db = require('../models')
 const { Restaurant, Category, User, Comment } = db
 const pageLimit = 10
+const helpers = require('../_helpers')
 
 const restController = {
   // 多筆餐廳資料
@@ -73,9 +74,16 @@ const restController = {
     })
       .then(async (restaurant) => {
         // 找出收藏此餐廳的 user
-        const isFavorited = restaurant.FavoritedUsers.map((d) => d.id).includes(req.user.id)
-        const isLiked = restaurant.LikedUsers.map((d) => d.id).includes(req.user.id)
+        //const isFavorited = restaurant.FavoritedUsers.map((d) => d.id).includes(req.user.id)
 
+        //const isLiked = restaurant.LikedUsers.map((d) => d.id).includes(req.user.id)
+
+        // 為了自動化測試
+        const userId = helpers.getUser(req).id
+        const isFavorited = restaurant.FavoritedUsers.map((d) => d.id).includes(userId)
+        const isLiked = restaurant.LikedUsers.map((d) => d.id).includes(userId)
+
+        // 瀏覽次數
         if (restaurant) {
           // 也可以寫 await restaurant.increment('viewCounts', { by: 1 })
           restaurant = await restaurant.increment({ 'viewCounts': 1 })

@@ -5,6 +5,7 @@ const { User, Comment, Restaurant, Category, Favorite, Like } = db
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const sequelize = db.sequelize
+const helpers = require('../_helpers')
 
 const userController = {
   // 註冊頁面
@@ -157,7 +158,7 @@ const userController = {
   // 加入Like
   addLike: (req, res) => {
     return Like.create({
-      UserId: req.user.id,
+      UserId: helpers.getUser(req).id,
       RestaurantId: req.params.restaurantId
     })
       .then((like) => {
@@ -169,7 +170,7 @@ const userController = {
   removeLike: (req, res) => {
     return Like.findOne({
       where: {
-        UserId: req.user.id,
+        UserId: helpers.getUser(req).id,
         RestaurantId: req.params.restaurantId
       }
     })
