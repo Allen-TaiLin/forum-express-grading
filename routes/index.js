@@ -56,8 +56,12 @@ module.exports = (app, passport) => {
   app.post('/like/:restaurantId', authenticated, userController.addLike)
   // 解除like
   app.delete('/like/:restaurantId', authenticated, userController.removeLike)
-
+  // 美食達人頁面
   app.get('/users/top', authenticated, userController.getTopUser)
+  // 追蹤使用者
+  app.post('/following/:userId', authenticated, userController.addFollowing)
+  // 取消追蹤
+  app.delete('/following/:userId', authenticated, userController.removeFollowing)
 
   // 連到 /admin 頁面就轉到 /admin/restaurants
   app.get('/admin', authenticatedAdmin, (req, res) => res.redirect('/admin/restaurants'))

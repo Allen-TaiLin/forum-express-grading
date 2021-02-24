@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 //const app = require('../app')
 const db = require('../models')
-const { User, Comment, Restaurant, Category, Favorite, Like } = db
+const { User, Comment, Restaurant, Category, Favorite, Like, Followship } = db
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const sequelize = db.sequelize
@@ -15,12 +15,12 @@ const userController = {
 
   // 註冊送出表單
   signUp: (req, res) => {
-    // confirm password
+    // TODO：confirm password
     if (req.body.passwordCheck !== req.body.password) {
       req.flash('error_messages', '兩次密碼輸入不同！')
       return res.redirect('/signup')
     } else {
-      // confirm unique user
+      // TODO：confirm unique user
       User.findOne({ where: { email: req.body.email } })
         .then((user) => {
           if (user) {
@@ -79,6 +79,7 @@ const userController = {
       }
     })
       .then((user) => {
+        // TODO：列出 user.toJSON()物件內資訊
         //console.log('*user.toJSON():', user.toJSON())
         //console.log('**user.toJSON().Comments[0].Restaurant:', user.toJSON().Comments[0].Restaurant)
 
@@ -182,25 +183,53 @@ const userController = {
       })
   },
 
+  // 美食達人頁面
   getTopUser: (req, res) => {
-    // 撈出所有 User 與 followers 資料
+    // TODO：撈出所有 User 與 followers 資料
     return User.findAll({
       include: [
         { model: User, as: 'Followers' }
       ]
     })
       .then((users) => {
-        // 整理 users 資料
+        // TODO：整理 users 資料
         users = users.map((user) => ({
           ...user.dataValues,
-          // 計算追蹤者人數
+          // TODO：計算追蹤者人數
           FollowerCount: user.Followers.length,
-          // 判斷目前登入使用者是否已追蹤該 User 物件
+          // TODO：判斷目前登入使用者是否已追蹤該 User 物件
           isFollowed: req.user.Followings.map((d) => d.id).includes(user.id)
         }))
-        // 依追蹤者人數排序清單
+        // TODO：依追蹤者人數排序清單
         users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
         return res.render('topUser', { users: users })
+      })
+  },
+
+  // 追蹤使用者
+  addFollowing: (req, res) => {
+    return Followship.create({
+      followerId: req.user.id,
+      followingId: req.params.userId
+    })
+      .then((followship) => {
+        return res.redirect('back')
+      })
+  },
+
+  // 取消追蹤
+  removeFollowing: (req, res) => {
+    return Followship.findOne({
+      where: {
+        followerId: req.user.id,
+        followingId: req.params.userId
+      }
+    })
+      .then((followship) => {
+        followship.destroy()
+          .then((result) => {
+            return res.redirect('back')
+          })
       })
   }
 }
