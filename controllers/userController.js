@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs')
-//const app = require('../app')
 const db = require('../models')
 const { User, Comment, Restaurant, Category, Favorite, Like, Followship } = db
 const imgur = require('imgur-node-api')
@@ -60,32 +59,36 @@ const userController = {
 
   // 瀏覽 Profile
   getUser: (req, res) => {
-    return User.findByPk(req.params.id, {
-      attributes: {
-        include: [
-          [sequelize.literal('(SELECT COUNT(DISTINCT RestaurantId) FROM comments)'), 'restaurant_count'],
-          [sequelize.literal('(SELECT COUNT(DISTINCT id) FROM comments)'), 'comment_count']
-        ]
-      },
-      group: ['comments.RestaurantId'],
-      nest: true,
-      include: {
-        model: Comment,
-        attributes: ['RestaurantId'],
-        nest: true,
-        include: [{
-          model: Restaurant
-        }]
-      }
-    })
-      .then((user) => {
-        // TODO：列出 user.toJSON()物件內資訊
-        //console.log('*user.toJSON():', user.toJSON())
-        //console.log('**user.toJSON().Comments[0].Restaurant:', user.toJSON().Comments[0].Restaurant)
+    User.findByPk(req.params.id)
+      .then(async (user) => {
+        const comments = await Comment.findAll({
+          where: {
+            UserId: req.params.id
+          },
+          raw: true,
+          nest: true,
+          include: Restaurant,
+          attributes: ['RestaurantId'],
+          group: ['RestaurantId']
+        })
+        const comment_count = await Comment.count({ where: { UserId: req.params.id } })
+        const restaurant_count = await Comment.count({
+          where: { UserId: req.params.id },
+          distinct: true,
+          col: 'RestaurantId'
+        })
 
-        let restaurants = (user.toJSON().Comments.length > 0) ?
-          user.toJSON().Comments.map((item) => item.Restaurant) : null
-        return res.render('user', { user: user.toJSON(), restaurants })
+        const data = {
+          favoritedRestaurants: helpers.getUser(req).FavoritedRestaurants,
+          followers: helpers.getUser(req).Followers,
+          followings: helpers.getUser(req).Followings
+        }
+
+        // TODO：列出觀察物件資料內容        
+        // console.log('**data:', data)
+        // console.log('***comments:', comments)
+
+        return res.render('user', { user: user.toJSON(), data, comments, comment_count, restaurant_count })
       })
   },
 
@@ -132,7 +135,7 @@ const userController = {
   // 加入最愛
   addFavorite: (req, res) => {
     return Favorite.create({
-      UserId: req.user.id,
+      UserId: helpers.getUser(req).id,
       RestaurantId: req.params.restaurantId
     })
       .then((favorite) => {
@@ -144,7 +147,7 @@ const userController = {
   removeFavorite: (req, res) => {
     return Favorite.findOne({
       where: {
-        UserId: req.user.id,
+        UserId: helpers.getUser(req).id,
         RestaurantId: req.params.restaurantId
       }
     })

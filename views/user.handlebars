@@ -7,27 +7,78 @@
       <div class="card-body" style="width: 75%;">
         <h5 class="card-title">{{user.name}}</h5>
         <p class="card-text">{{user.email}}</p>
-        <p class="card-text">已評論餐廳數: {{user.restaurant_count}}</p>
-        <p class="card-text">總評論數: {{user.comment_count}}</p>
+        <p class="card-text"><strong>{{restaurant_count}}</strong> 已評論餐廳</p>
+        <p class="card-text"><strong>{{data.favoritedRestaurants.length}}</strong> 收藏的餐廳</p>
+        <p class="card-text"><strong>{{data.followings.length}}</strong> followings</p>
+        <p class="card-text"><strong>{{data.followers.length}}</strong> followers</p>
         <a href="/users/{{user.id}}/edit" class="btn btn-primary">Edit</a>
       </div>
     </div>
   </div>
 </div>
 
-{{#if restaurants}}
 <div class="row mt-3">
-  {{#each restaurants}}
-  <div class="col-3">
+  <div class="col-md-4">
     <div class="card">
+      <div class="card-header"><strong>{{data.followings.length}}</strong> followings</div>
       <div class="card-body">
-        <div class="d-flex" style="flex-direction: column;">
-          <img src="{{this.image}}" alt="restaurant-img">
-          <a href="/restaurants/{{this.id}}">{{this.name}}</a>
+        <div class="row">
+          {{#each data.followings}}
+          <div class="d-flex col-md-3" style="flex-direction: column;">
+            <img src="{{this.image}}" alt="user-img">
+            <a href="/users/{{this.id}}">{{this.name}}</a>
+          </div>
+          {{/each}}
         </div>
       </div>
     </div>
   </div>
-  {{/each}}
+
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><strong>{{restaurant_count}}</strong> 已評論餐廳</div>
+      <div class="card-body">
+        <div class="row">
+          {{#each comments}}
+          <div class="d-flex col-md-2" style="flex-direction: column;">
+            <img src="{{this.Restaurant.image}}" alt="restaurant-img">
+            <a href="/restaurants/{{this.Restaurant.id}}">{{this.Restaurant.name}}</a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header"><strong>{{data.followers.length}}</strong> followers</div>
+      <div class="card-body">
+        <div class="row">
+          {{#each data.followers}}
+          <div class="d-flex col-md-3" style="flex-direction: column;">
+            <img src="{{this.image}}" alt="user-img">
+            <a href="/users/{{this.id}}">{{this.name}}</a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header"><strong>{{data.favoritedRestaurants.length}}</strong> 收藏的餐廳</div>
+      <div class="card-body">
+        <div class="row">
+          {{#each data.favoritedRestaurants}}
+          <div class="d-flex col-md-2" style="flex-direction: column;">
+            <img src="{{this.image}}" alt="restaurant-img">
+            <a href="/restaurants/{{this.id}}">{{this.name}}</a>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{{/if}}
