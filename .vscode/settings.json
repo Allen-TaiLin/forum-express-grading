@@ -3,12 +3,14 @@
     "cleardb",
     "cond",
     "exphbs",
+    "favorited",
     "followship",
     "if",
     "imgur",
     "originalname",
     "resave",
     "signin",
-    "signup"
+    "signup",
+    "users"
   ]
 }

@@ -2,6 +2,7 @@ const db = require('../models')
 const { Restaurant, Category, User, Comment } = db
 const pageLimit = 10
 const helpers = require('../_helpers')
+const sequelize = require('sequelize')
 
 const restController = {
   // 多筆餐廳資料
@@ -29,6 +30,7 @@ const restController = {
         const page = Number(req.query.page) || 1  //  起始頁數
         const pages = Math.ceil(result.count / pageLimit) //  總頁數
         const totalPage = Array.from({ length: pages }).map((item, index) => index + 1) //  總共有幾頁 (顯示列表上)
+        // TODO：列出觀察物件資料內容
         // console.log('***', totalPage)
         // console.log('result.count:', result.count)
         // console.log('result.rows:', result.rows)
@@ -74,18 +76,13 @@ const restController = {
     })
       .then(async (restaurant) => {
         // 找出收藏此餐廳的 user
-        //const isFavorited = restaurant.FavoritedUsers.map((d) => d.id).includes(req.user.id)
-
-        //const isLiked = restaurant.LikedUsers.map((d) => d.id).includes(req.user.id)
-
-        // 為了自動化測試
         const userId = helpers.getUser(req).id
         const isFavorited = restaurant.FavoritedUsers.map((d) => d.id).includes(userId)
         const isLiked = restaurant.LikedUsers.map((d) => d.id).includes(userId)
 
         // 瀏覽次數
         if (restaurant) {
-          // 也可以寫 await restaurant.increment('viewCounts', { by: 1 })
+          // TODO：也可以寫 await restaurant.increment('viewCounts', { by: 1 })
           restaurant = await restaurant.increment({ 'viewCounts': 1 })
         }
 
@@ -126,9 +123,40 @@ const restController = {
         // attributes: { include: ['viewCounts'] }
       })
     ]).then(([commentCount, restaurant]) => {
-      // console.log('*restaurant:', restaurant.toJSON())     
       res.render('dashboard', { commentCount, restaurant: restaurant.toJSON() })
     })
+  },
+
+  // Top 10 人氣餐廳
+  getTopRestaurants: (req, res) => {
+    // 登入者收藏的餐廳資料
+    const favoritedRestaurants = helpers.getUser(req).FavoritedRestaurants
+    return Restaurant.findAll({
+      attributes: {
+        include: [
+          [sequelize.literal('(SELECT COUNT(*) FROM Favorites WHERE Favorites.RestaurantId = Restaurant.id)'), 'FavoritedCount'],
+          [sequelize.literal(`(SELECT Likes.UserId FROM Likes WHERE Likes.RestaurantId = Restaurant.id And Likes.UserId = ${req.user.id})`), 'LikeByUsers']
+        ]
+      },
+      order: [
+        [sequelize.literal('FavoritedCount'), 'DESC']
+      ],
+      raw: true,
+      nest: true,
+      limit: 10
+    })
+      .then((restaurants) => {
+        console.log('*restaurants:', restaurants)
+        //console.log('*restaurants.json:', restaurants.toJSON())
+        restaurants = restaurants.map((restaurant) => ({
+          ...restaurant,
+          description: restaurant.description.substring(0, 50),
+          isFavorited: favoritedRestaurants.map((item) => item.id).includes(restaurant.id),
+          isLike: (restaurant.LikeByUsers !== null)
+        }))
+
+        return res.render('topRestaurants', { restaurants })
+      })
   }
 }
 
