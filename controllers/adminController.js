@@ -9,7 +9,7 @@ const fs = require('fs')
 const adminController = {
   getRestaurants: (req, res) => {
     adminService.getRestaurants(req, res, (data) => {
-      return res, render('admin/restaurants', data)
+      return res.render('admin/restaurants', data)
     })
   },
 
