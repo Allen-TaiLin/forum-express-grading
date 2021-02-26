@@ -21,6 +21,7 @@ app.engine('handlebars', exphbs({
 }))  // Handlebars 註冊樣板引擎
 app.set('view engine', 'handlebars')  // 設定使用 Handlebars 做為樣板引擎
 app.use(bodyParser.urlencoded({ extended: true }))  // setup bodyParser
+app.use(bodyParser.json())
 app.use(methodOverride('_method'))
 // setup session and flash
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }))
