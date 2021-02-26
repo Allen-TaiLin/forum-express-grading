@@ -16,6 +16,8 @@ router.get('/admin/restaurants/:id', adminController.getRestaurant)
 router.put('/admin/restaurants/:id', upload.single('image'), adminController.putRestaurant)
 // 瀏覽分類
 router.get('/admin/categories', categoryController.getCategories)
+// 修改分類
+router.put('/admin/categories/:id', categoryController.putCategory)
 // 新增餐廳
 router.post('/admin/restaurants', upload.single('image'), adminController.postRestaurant)
 // 刪除餐廳
